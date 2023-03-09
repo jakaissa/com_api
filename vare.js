@@ -1,0 +1,9 @@
+email;
+tel;
+adresse;
+gps;
+wilaya;
+cposte;
+pays;
+facebook;
+instagram;
