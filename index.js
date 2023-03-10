@@ -3,11 +3,16 @@ const app = express();
 const cors = require("cors");
 const { MongoClient } = require("mongodb");
 var bodyParser = require("body-parser");
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
 //app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.urlencoded());
 
 app.use(cors({}));
+//app.use(express.static("upload"));
+app.use("/upload", express.static(__dirname + "/upload"));
 const port = 3000;
 
 let data = [];
@@ -18,6 +23,46 @@ var url =
 var client = new MongoClient(url);
 
 const db = client.db("commercial").collection("data");
+
+// MULTER UPLOAD
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "./uploads");
+//   },
+//   filename: function (req, file, cb) {
+//     console.log(req.body.age);
+//     //
+//     fs.mkdirSync(`./uploads/`);
+//     //
+//     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+//     cb(null, file.originalname.split(".")[0].toLowerCase() + ".png");
+//   },
+// });
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    console.log(req.body);
+    const { name } = req.body;
+    const dir = `./upload/${name}`;
+    fs.exists(dir, (exist) => {
+      if (!exist) {
+        return fs.mkdir(dir, (error) => cb(error, dir));
+      }
+      return cb(null, dir);
+    });
+  },
+  filename: (req, file, cb) => {
+    const { userId } = req.body;
+    cb(null, file.originalname.split(".")[0].toLowerCase() + ".png");
+  },
+});
+const upload = multer({ storage: storage });
+
+app.post("/upload", upload.array("photos", 12), async (req, res) => {
+  res.json({ message: "success" });
+});
+//
+
+//app.use(express.static(path.join(__dirname, "..", "public")));
 
 app.get("/test", async (req, res) => {
   let data = await db.find({});
