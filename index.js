@@ -58,7 +58,11 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 app.post("/upload", upload.array("photos", 12), async (req, res) => {
-  res.json({ message: "success" });
+  try{ res.json({ message: "success" });
+  }catch(e){
+    res.send({error : e});
+  }
+ 
 });
 //
 
