@@ -51,18 +51,14 @@ const storage = multer.diskStorage({
     });
   },
   filename: (req, file, cb) => {
-    const { userId } = req.body;
+    const { name } = req.body;
     cb(null, file.originalname.split(".")[0].toLowerCase() + ".png");
   },
 });
 const upload = multer({ storage: storage });
 
 app.post("/upload", upload.array("photos", 12), async (req, res) => {
-  try{ res.json({ message: "success" });
-  }catch(e){
-    res.send({error : e});
-  }
- 
+  res.json({ message: "success" });
 });
 //
 
